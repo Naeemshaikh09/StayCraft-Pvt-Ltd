@@ -4,6 +4,8 @@ if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 console.log("NODE_ENV =", process.env.NODE_ENV);
+console.log("Has RESEND_API_KEY?", Boolean(process.env.RESEND_API_KEY));
+console.log("RESEND keys:", Object.keys(process.env).filter(k => k.includes("RESEND")));
 const express = require("express");
 const app = express();
 
