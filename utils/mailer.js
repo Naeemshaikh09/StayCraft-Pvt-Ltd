@@ -9,16 +9,14 @@ if (!user || !pass) {
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // SSL
+  port: 587,
+  secure: false, // 587 = STARTTLS (NOT SSL)
   auth: { user, pass },
 
-  // stop hanging forever
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
   socketTimeout: 20000,
 });
-
 async function verifyMailerOnce() {
   // Don't keep verifying again and again in production logs
   if (process.env.NODE_ENV === "production") return;
