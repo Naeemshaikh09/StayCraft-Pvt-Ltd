@@ -1,9 +1,16 @@
+// app.js
+
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
 const express = require("express");
 const app = express();
+
+// IMPORTANT (Render/any proxy):
+// Fixes express-rate-limit X-Forwarded-For warning and helps secure cookies work behind proxy.
+app.set("trust proxy", 1);
+
 const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
@@ -14,7 +21,6 @@ const session = require("express-session");
 const flash = require("./utils/flash");
 const staticRouter = require("./routes/static.js");
 const apiRouter = require("./routes/api.js");
-
 
 const { csrfToken, verifyCsrf } = require("./utils/csrf");
 
@@ -43,7 +49,6 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser(process.env.SESSION_SECRET));
 
-// security
 // -------------------- security middleware --------------------
 app.use(
   helmet({
@@ -88,7 +93,7 @@ const cspDirectives = {
     "https://images.unsplash.com",
   ],
 
-  // ✅ This fixes your .map warnings (bootstrap + maplibre)
+  // map libs / tiles
   connectSrc: [
     "'self'",
     "https://cdn.jsdelivr.net",
@@ -98,7 +103,6 @@ const cspDirectives = {
   ],
 
   workerSrc: ["'self'", "blob:"],
-
   objectSrc: ["'none'"],
   baseUri: ["'self'"],
   frameAncestors: ["'self'"],
@@ -110,16 +114,26 @@ app.use(
     directives: cspDirectives,
   })
 );
+
 app.use(mongoSanitize());
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
+
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 300,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
 // db
 const dbUrl = process.env.ATLASDB_URL;
-mongoose.connect(dbUrl).then(() => console.log("✅ Database connected")).catch(console.log);
+mongoose
+  .connect(dbUrl)
+  .then(() => console.log("✅ Database connected"))
+  .catch(console.log);
 
 // session store
-if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
-
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: { secret: process.env.SESSION_SECRET || "dev_secret" },
@@ -180,17 +194,20 @@ app.use("/listings/:id/reviews", reviewsRouter);
 app.use("/", userRouter);
 app.use("/", staticRouter);
 
-
 // error handlers
 const safeBack = (req) => req.get("Referrer") || "/listings";
 
 app.use((err, req, res, next) => {
   if (err?.code === "EBADCSRFTOKEN") {
-    req.flash("error", err.message || "Form expired or invalid. Please try again.");
+    req.flash(
+      "error",
+      err.message || "Form expired or invalid. Please try again."
+    );
     return res.redirect(safeBack(req));
   }
   next(err);
 });
+
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
     req.flash("error", "Image too large. Max size is 4 MB.");
@@ -211,4 +228,6 @@ app.use((err, req, res, next) => {
   return res.redirect(safeBack(req));
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("✅ Server running on port 3000"));
+app.listen(process.env.PORT || 3000, () =>
+  console.log("✅ Server running on port 3000")
+);
