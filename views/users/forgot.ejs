@@ -1,0 +1,28 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div>
+        <h2 class="auth-title">Reset your password</h2>
+        <p class="auth-subtitle">Enter your email and we’ll send a reset link.</p>
+      </div>
+      <div class="auth-icon-circle">
+        <i class="fa-solid fa-key"></i>
+      </div>
+    </div>
+
+    <form action="/forgot" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control" required />
+      </div>
+
+      <button type="submit" class="btn auth-btn-primary">Send reset link</button>
+    </form>
+
+    <p class="auth-footer-text"><a href="/login">Back to login</a></p>
+  </div>
+</div>

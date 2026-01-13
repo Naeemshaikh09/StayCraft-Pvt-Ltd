@@ -1,0 +1,158 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="show-page mb-5">
+  <div class="text-center mb-3">
+    <h2 class="show-title mb-1"><%= listing.title %></h2>
+
+    <div class="text-muted">
+      <i class="fa-solid fa-location-dot me-2"></i><%= listing.location %>, <%= listing.country %>
+    </div>
+
+    <!-- ✅ Rating block added here -->
+    <% if (listing.ratingCount && listing.ratingCount > 0) { %>
+      <div class="text-muted mt-1">
+        <i class="fa-solid fa-star me-1" style="color:#f59e0b;"></i>
+        <b><%= Number(listing.ratingAvg || 0).toFixed(1) %></b>
+        <span>(<%= listing.ratingCount %> reviews)</span>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-7">
+      <img
+        src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://source.unsplash.com/random/1200x800?home' %>"
+        class="show-hero-img"
+        alt="listing image"
+      >
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="show-panel">
+        <div class="mb-2">
+          Hosted by <b><%= listing.owner ? listing.owner.username : "Unknown" %></b>
+        </div>
+
+        <% if (currentUser) { %>
+          <form method="POST" action="/listings/<%= listing._id %>/save" class="d-inline js-save-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <button type="submit" class="btn btn-sm <%= isSaved ? 'btn-outline-brand' : 'btn-brand' %> js-save-show-btn">
+              <i class="<%= isSaved ? 'fa-solid' : 'fa-regular' %> fa-bookmark me-1"></i>
+              <span class="js-save-show-text"><%= isSaved ? "Saved" : "Save" %></span>
+            </button>
+          </form>
+        <% } %>
+
+        <div class="show-price mb-2">
+          &#8377; <%= listing.price != null ? listing.price.toLocaleString("en-IN") : "N/A" %>
+          <span class="text-muted fw-normal fs-6">/ night</span>
+        </div>
+
+        <div class="text-secondary clamp-3" id="descClamp">
+          <%= listing.description %>
+        </div>
+
+        <% if (listing.description && listing.description.length > 180) { %>
+          <button class="btn btn-link p-0 mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#fullDesc">
+            Read more
+          </button>
+
+          <div class="collapse mt-2" id="fullDesc">
+            <div class="text-secondary"><%= listing.description %></div>
+          </div>
+        <% } %>
+
+        <% if (currentUser && listing.owner && currentUser._id.equals(listing.owner._id)) { %>
+          <div class="d-flex gap-2 mt-3">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark btn-sm">Edit</a>
+
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn-outline-danger btn-sm">Delete</button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-7">
+      <% if (currentUser) { %>
+        <div class="show-panel">
+          <h5 class="mb-3">Leave a Review</h5>
+
+          <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <div class="mb-2">
+              <fieldset class="starability-slot">
+                <input type="radio" class="input-no-rate" name="review[rating]" value="1" checked />
+                <input type="radio" id="rate1" name="review[rating]" value="1"><label for="rate1">1</label>
+                <input type="radio" id="rate2" name="review[rating]" value="2"><label for="rate2">2</label>
+                <input type="radio" id="rate3" name="review[rating]" value="3"><label for="rate3">3</label>
+                <input type="radio" id="rate4" name="review[rating]" value="4"><label for="rate4">4</label>
+                <input type="radio" id="rate5" name="review[rating]" value="5"><label for="rate5">5</label>
+              </fieldset>
+            </div>
+
+            <div class="mb-3">
+              <textarea name="review[comments]" rows="3" class="form-control" required placeholder="How was your stay?"></textarea>
+              <div class="invalid-feedback">Please enter some comment</div>
+            </div>
+
+            <button class="btn btn-dark btn-sm">Submit</button>
+          </form>
+        </div>
+      <% } %>
+
+      <% if (listing.reviews && listing.reviews.length > 0) { %>
+        <h5 class="mt-4 mb-3">Recent Reviews</h5>
+
+        <div class="row g-3">
+          <% for (review of listing.reviews) { %>
+            <div class="col-12">
+              <div class="show-panel">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0">@<%= review.author ? review.author.username : "Unknown" %></h6>
+                  <p class="starability-result mb-0" data-rating="<%= review.rating %>"></p>
+                </div>
+
+                <p class="text-secondary mb-2"><%= review.comments %></p>
+
+                <% if (currentUser && review.author && currentUser._id.equals(review.author._id)) { %>
+                  <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button class="btn btn-link btn-sm text-danger p-0">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="show-panel">
+        <h5 class="mb-3">Location</h5>
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.mapConfig = {
+    token: <%- JSON.stringify(process.env.MAP_TILE_TOKEN || process.env.MAP_TOKEN || "") %>,
+    lng: <%= (listing.geometry && listing.geometry.coordinates) ? listing.geometry.coordinates[0] : 0 %>,
+    lat: <%= (listing.geometry && listing.geometry.coordinates) ? listing.geometry.coordinates[1] : 0 %>,
+    title: <%- JSON.stringify(listing.title || "") %>,
+    subtitle: <%- JSON.stringify([listing.location, listing.country].filter(Boolean).join(", ")) %>
+  };
+</script>
+
+<script defer src="/js/map.js"></script>

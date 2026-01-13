@@ -1,0 +1,128 @@
+<!-- ===== Desktop Navbar (md and up) ===== -->
+<nav id="sc-header-desktop" class="navbar navbar-expand-lg bg-white border-bottom sticky-top d-none d-md-block ">
+  <div class="container-xl">
+    <a class="navbar-brand d-flex align-items-center" href="/listings">
+      <img src="/images/staycraft-logo.svg" alt="StayCraft" class="nav-logo">
+    </a>
+
+    <div class="collapse navbar-collapse show">
+      <ul class="navbar-nav me-3">
+        <li class="nav-item">
+          <a class="nav-link" href="/listings">Explore</a>
+        </li>
+      </ul>
+
+      <!-- Desktop live search -->
+      <form class="sc-search js-sc-search d-none d-lg-flex flex-grow-1 me-3"
+            action="/listings" method="GET" role="search" autocomplete="off">
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+              type="text"
+              name="q"
+              class="sc-search-input"
+              placeholder="Search city, country, or title"
+              autocomplete="off"
+              value="<%= (typeof q !== 'undefined' && q) ? q : '' %>">
+
+            <input
+              type="hidden"
+              name="category"
+              value="<%= (typeof category !== 'undefined' && category) ? category : '' %>"
+            >
+            <input type="hidden" name="minPrice" value="<%= (typeof minPrice !== 'undefined' && minPrice !== '' && minPrice != null) ? minPrice : '' %>">
+            <input type="hidden" name="maxPrice" value="<%= (typeof maxPrice !== 'undefined' && maxPrice !== '' && maxPrice != null) ? maxPrice : '' %>">
+            <input type="hidden" name="sort" value="<%= (typeof sort !== 'undefined' && sort) ? sort : 'newest' %>">
+        <button class="sc-search-btn" type="submit">Search</button>
+
+        <div class="sc-suggest" role="listbox" aria-label="Search suggestions"></div>
+        <% if (typeof savedOnly !== 'undefined' && savedOnly) { %>
+          <input type="hidden" name="saved" value="1">
+        <% } %>
+      </form>
+
+      <div class="d-flex gap-2 ms-auto">
+        <a class="btn btn-outline-brand" href="/listings/new">List your place</a>
+
+        <% if (!currentUser) { %>
+          <a class="btn btn-light" href="/signup"><b>Sign up</b></a>
+          <a class="btn btn-light" href="/login"><b>Log in</b></a>
+        <% } else { %>
+          <a class="btn btn-light" href="/logout"><b>Log out</b></a>
+        <% } %>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Mobile Top Header (phones only) ===== -->
+<nav id="sc-header-mobile" class="mobile-topbar d-md-none">
+  <div class="container-xl mobile-topbar-inner">
+    <a href="/listings" class="d-flex align-items-center">
+      <img src="/images/staycraft-logo.svg" alt="StayCraft" class="nav-logo nav-logo-mobile">
+    </a>
+
+    <!-- Mobile live search -->
+    <form class="sc-search js-sc-search sc-search-mobile"
+          action="/listings" method="GET" role="search" autocomplete="off">
+      <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input
+            type="text"
+            name="q"
+            class="sc-search-input"
+            placeholder="Search stays"
+            autocomplete="off"
+            value="<%= (typeof q !== 'undefined' && q) ? q : '' %>"
+          >
+
+            <input
+              type="hidden"
+              name="category"
+              value="<%= (typeof category !== 'undefined' && category) ? category : '' %>"
+            >
+            <input type="hidden" name="minPrice" value="<%= (typeof minPrice !== 'undefined' && minPrice !== '' && minPrice != null) ? minPrice : '' %>">
+            <input type="hidden" name="maxPrice" value="<%= (typeof maxPrice !== 'undefined' && maxPrice !== '' && maxPrice != null) ? maxPrice : '' %>">
+            <input type="hidden" name="sort" value="<%= (typeof sort !== 'undefined' && sort) ? sort : 'newest' %>">
+      <button class="sc-search-btn sc-search-btn-compact" type="submit" aria-label="Search">
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+
+      <div class="sc-suggest" role="listbox" aria-label="Search suggestions"></div>
+      <% if (typeof savedOnly !== 'undefined' && savedOnly) { %>
+      <input type="hidden" name="saved" value="1">
+      <% } %>
+    </form>
+  </div>
+</nav>
+
+<!-- ===== Mobile Bottom Nav (phones only) ===== -->
+<nav class="mobile-bottom-nav d-md-none">
+  <a class="mbn-item" href="/listings">
+    <i class="fa-solid fa-compass"></i>
+    <span>Explore</span>
+  </a>
+
+  <a class="mbn-item" href="/saved">
+    <i class="fa-regular fa-bookmark"></i>
+    <span>Saved</span>
+  </a>
+
+  <a class="mbn-item" href="/listings/new">
+    <i class="fa-solid fa-plus"></i>
+    <span>Host</span>
+  </a>
+
+  <% if (!currentUser) { %>
+    <a class="mbn-item" href="/login">
+      <i class="fa-regular fa-user"></i>
+      <span>Account</span>
+    </a>
+  <% } else { %>
+    <a class="mbn-item" href="/logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <span>Logout</span>
+    </a>
+  <% } %>
+</nav>

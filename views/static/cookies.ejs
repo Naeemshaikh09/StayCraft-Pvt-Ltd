@@ -1,0 +1,95 @@
+<% layout("/layouts/boilerplate") %>
+
+<%
+  const lastUpdated = "2026-01-13";
+%>
+
+<div class="legal-page py-4">
+  <div class="legal-hero">
+    <h1 class="legal-title">Cookie Policy</h1>
+    <p class="legal-subtitle">
+      This policy explains how StayCraft uses cookies and similar technologies to operate securely and improve your experience.
+    </p>
+    <p class="legal-meta">Last updated: <%= lastUpdated %></p>
+  </div>
+
+  <div class="row g-4 mt-2">
+    <div class="col-12 col-lg-4">
+      <div class="card legal-card">
+        <div class="card-body">
+          <h5 class="mb-3">Contents</h5>
+          <ol class="legal-toc">
+            <li><a href="#what">What are cookies?</a></li>
+            <li><a href="#types">Types we use</a></li>
+            <li><a href="#essential">Essential/session cookies</a></li>
+            <li><a href="#csrf">Security (CSRF)</a></li>
+            <li><a href="#thirdparty">Third-party cookies</a></li>
+            <li><a href="#manage">How to manage cookies</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+
+      <div class="card legal-card mb-4" id="what">
+        <div class="card-body">
+          <h3 class="legal-section-title">1) What are cookies?</h3>
+          <p class="mb-0">
+            Cookies are small text files stored by your browser. They help websites remember session state and preferences.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="types">
+        <div class="card-body">
+          <h3 class="legal-section-title">2) Types we use</h3>
+          <ul class="mb-0">
+            <li><b>Essential cookies</b> — required for login sessions and secure actions.</li>
+            <li><b>Security tokens</b> — used to protect forms against CSRF attacks.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="essential">
+        <div class="card-body">
+          <h3 class="legal-section-title">3) Essential/session cookies</h3>
+          <p class="mb-0">
+            StayCraft uses session cookies so you can remain logged in while browsing and using features like saving listings.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="csrf">
+        <div class="card-body">
+          <h3 class="legal-section-title">4) Security (CSRF)</h3>
+          <p class="mb-0">
+            We use CSRF protection tokens to ensure actions like posting reviews or saving listings are initiated by you.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="thirdparty">
+        <div class="card-body">
+          <h3 class="legal-section-title">5) Third-party cookies</h3>
+          <p class="mb-0">
+            Some third-party services (CDNs, map providers) may set cookies depending on how resources are loaded.
+            StayCraft does not control those cookies directly.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card" id="manage">
+        <div class="card-body">
+          <h3 class="legal-section-title">6) How to manage cookies</h3>
+          <ul class="mb-0">
+            <li>You can clear cookies in your browser settings.</li>
+            <li>You can block cookies, but login and secure actions may stop working.</li>
+            <li>Private browsing reduces persistence of cookies.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

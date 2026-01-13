@@ -1,0 +1,114 @@
+<footer class="sc-footer mt-auto">
+  <div class="container-xl">
+    <div class="sc-footer-top">
+      <div class="row g-4">
+        <!-- Brand -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="sc-footer-brand">
+            <div class="sc-footer-logo">
+              <img src="/images/staycraft-logo.svg" alt="StayCraft" />
+            </div>
+
+            <p class="sc-footer-about">
+              StayCraft helps you explore unique stays, save favorites, and share honest reviews.
+              Built with a focus on performance, security, and a clean user experience.
+            </p>
+
+            <div class="sc-footer-social">
+              <a class="sc-social-link" href="#" aria-label="Facebook" title="Facebook">
+                <i class="fa-brands fa-facebook"></i>
+              </a>
+              <a class="sc-social-link" href="#" aria-label="Instagram" title="Instagram">
+                <i class="fa-brands fa-square-instagram"></i>
+              </a>
+              <a class="sc-social-link" href="#" aria-label="LinkedIn" title="LinkedIn">
+                <i class="fa-brands fa-linkedin"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Explore -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <h6 class="sc-footer-title">Explore</h6>
+          <ul class="sc-footer-links">
+            <li><a href="/listings">Listings</a></li>
+            <li><a href="/listings?sort=ratingDesc">Top rated</a></li>
+            <li><a href="/listings?sort=priceAsc">Budget stays</a></li>
+            <li><a href="/listings/new">List your place</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <h6 class="sc-footer-title">Support</h6>
+          <ul class="sc-footer-links">
+            <li><a href="/help">Help Center</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li>
+              <a
+                href="mailto:abuse@staycraft.example?subject=Report%20a%20listing&body=Please%20include%20the%20listing%20URL%20and%20details."
+              >
+                Report a listing
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Newsletter -->
+        <div class="col-12 col-md-12 col-lg-4">
+          <h6 class="sc-footer-title">Get updates</h6>
+
+          <div class="sc-footer-newsletter">
+            <p class="sc-footer-muted mb-2">
+              New stays and product updates. No spam.
+            </p>
+
+            <form class="sc-newsletter-form" action="/newsletter" method="POST" novalidate>
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input
+                class="sc-newsletter-input"
+                type="email"
+                name="email"
+                placeholder="you@example.com"
+                required
+              >
+              <button class="sc-newsletter-btn" type="submit">Subscribe</button>
+            </form>
+
+            <div class="sc-footer-mini">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>
+                We only use your email to send updates. You can unsubscribe anytime.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legal -->
+        <div class="col-12">
+          <div class="sc-footer-legal-links">
+            <a href="/privacy">Privacy Policy</a>
+            <span class="sc-dot">•</span>
+            <a href="/terms">Terms of Service</a>
+            <span class="sc-dot">•</span>
+            <a href="/cookies">Cookie Policy</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="sc-footer-bottom">
+      <div class="sc-footer-bottom-left">
+        <span>&copy; <%= new Date().getFullYear() %> StayCraft</span>
+        <span class="sc-dot">•</span>
+        <span class="sc-footer-muted">All rights reserved</span>
+      </div>
+
+      <div class="sc-footer-bottom-right sc-footer-muted">
+        StayCraft is an independent demo project and is not affiliated with Airbnb.
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,27 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div>
+        <h2 class="auth-title">Verify your email</h2>
+        <p class="auth-subtitle">Enter your email to get a verification link.</p>
+      </div>
+    </div>
+
+    <form action="/verify-email/resend" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="mb-3">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-control" type="email" name="email" id="email" required>
+      </div>
+
+      <button class="btn auth-btn-primary">Send verification link</button>
+    </form>
+
+    <p class="auth-footer-text">
+      <a href="/login">Back to login</a>
+    </p>
+  </div>
+</div>

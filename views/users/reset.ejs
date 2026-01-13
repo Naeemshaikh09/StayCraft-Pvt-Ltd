@@ -1,0 +1,26 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div>
+        <h2 class="auth-title">Choose a new password</h2>
+        <p class="auth-subtitle">Minimum 8 characters.</p>
+      </div>
+      <div class="auth-icon-circle">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+    </div>
+
+    <form action="/reset/<%= token %>" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="mb-3">
+        <label for="password" class="form-label">New password</label>
+        <input type="password" name="password" id="password" class="form-control" required />
+      </div>
+
+      <button type="submit" class="btn auth-btn-primary">Update password</button>
+    </form>
+  </div>
+</div>

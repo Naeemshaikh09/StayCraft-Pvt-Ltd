@@ -1,0 +1,295 @@
+<% layout("/layouts/boilerplate") %>
+
+<%
+  const minP = (minPrice !== undefined && minPrice !== null) ? String(minPrice).trim() : "";
+  const maxP = (maxPrice !== undefined && maxPrice !== null) ? String(maxPrice).trim() : "";
+
+  const hasPrice = (minP !== "" || maxP !== "");
+  const priceLabel = hasPrice
+    ? `₹${minP !== "" ? minP : "0"} - ₹${maxP !== "" ? maxP : "∞"}`
+    : "Price";
+
+  const savedIdsSafe =
+    (typeof savedIds !== "undefined" && Array.isArray(savedIds)) ? savedIds : [];
+
+  const sortSafe = (typeof sort !== "undefined" && sort) ? String(sort) : "newest";
+  const sortLabel =
+    sortSafe === "priceAsc" ? "Price ↑" :
+    sortSafe === "priceDesc" ? "Price ↓" :
+    sortSafe === "ratingDesc" ? "Rating ↓" :
+    "Newest";
+
+  const savedOnlySafe = (typeof savedOnly !== "undefined" && savedOnly) ? true : false;
+
+  // pagination values from controller
+  const pageSafe = Math.max(1, Number(page) || 1);
+  const totalPagesSafe = Math.max(1, Number(totalPages) || 1);
+  const totalCountSafe = Math.max(0, Number(totalCount) || 0);
+  const rangeStartSafe = Math.max(0, Number(rangeStart) || 0);
+  const rangeEndSafe = Math.max(0, Number(rangeEnd) || 0);
+
+  function buildUrl(overrides = {}) {
+    const params = new URLSearchParams();
+
+    if (q) params.set("q", q);
+    if (category) params.set("category", category);
+    if (minP) params.set("minPrice", minP);
+    if (maxP) params.set("maxPrice", maxP);
+    if (sortSafe && sortSafe !== "newest") params.set("sort", sortSafe);
+    if (savedOnlySafe) params.set("saved", "1");
+
+    // keep current page by default
+    params.set("page", String(pageSafe));
+
+    for (const [k, v] of Object.entries(overrides)) {
+      if (v === null || v === "" || v === undefined) params.delete(k);
+      else params.set(k, String(v));
+    }
+
+    const qs = params.toString();
+    return "/listings" + (qs ? `?${qs}` : "");
+  }
+
+  const hasNextPage = pageSafe < totalPagesSafe;
+  const nextUrl = hasNextPage ? buildUrl({ page: pageSafe + 1 }) : "";
+%>
+
+<!-- ===== Toolbar ===== -->
+<div class="index-toolbar">
+  <div class="index-toolbar-inner container-xl">
+    <div class="chip-row">
+
+      <!-- Mobile category dropdown -->
+      <div class="dropdown d-sm-none">
+        <button class="btn btn-sm btn-outline-brand dropdown-toggle" type="button" data-bs-toggle="dropdown" style="white-space:nowrap">
+          <i class="fa-solid fa-layer-group me-1"></i>
+          <%= category ? category : "Category" %>
+        </button>
+        <ul class="dropdown-menu sc-cat-menu">
+          <li><a class="dropdown-item <%= !category ? 'active' : '' %>" href="<%= buildUrl({ category: null, page: 1 }) %>">All</a></li>
+          <% for (let cat of categories) { %>
+            <li><a class="dropdown-item <%= category === cat ? 'active' : '' %>" href="<%= buildUrl({ category: cat, page: 1 }) %>"><%= cat %></a></li>
+          <% } %>
+        </ul>
+      </div>
+
+      <!-- Desktop category chips -->
+      <div class="chip-scroll d-none d-sm-flex">
+        <a class="cat-chip <%= !category ? 'active' : '' %>" href="<%= buildUrl({ category: null, page: 1 }) %>">All</a>
+        <% for (let cat of categories) { %>
+          <a class="cat-chip <%= category === cat ? 'active' : '' %>" href="<%= buildUrl({ category: cat, page: 1 }) %>"><%= cat %></a>
+        <% } %>
+      </div>
+
+      <!-- Sort dropdown -->
+      <div class="dropdown">
+        <button class="btn btn-sm btn-outline-brand dropdown-toggle" type="button" data-bs-toggle="dropdown" style="white-space:nowrap">
+          <i class="fa-solid fa-arrow-up-wide-short me-1"></i><%= sortLabel %>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item <%= sortSafe === 'newest' ? 'active' : '' %>" href="<%= buildUrl({ sort: null, page: 1 }) %>">Newest</a></li>
+          <li><a class="dropdown-item <%= sortSafe === 'priceAsc' ? 'active' : '' %>" href="<%= buildUrl({ sort: 'priceAsc', page: 1 }) %>">Price: Low to High</a></li>
+          <li><a class="dropdown-item <%= sortSafe === 'priceDesc' ? 'active' : '' %>" href="<%= buildUrl({ sort: 'priceDesc', page: 1 }) %>">Price: High to Low</a></li>
+          <li><a class="dropdown-item <%= sortSafe === 'ratingDesc' ? 'active' : '' %>" href="<%= buildUrl({ sort: 'ratingDesc', page: 1 }) %>">Top Rated</a></li>
+        </ul>
+      </div>
+
+      <!-- Saved-only (desktop only) -->
+      <% if (currentUser) { %>
+        <a class="btn btn-sm <%= savedOnlySafe ? 'btn-brand' : 'btn-outline-brand' %> d-none d-sm-inline-flex"
+           href="<%= buildUrl({ saved: savedOnlySafe ? null : '1', page: 1 }) %>">
+          <i class="fa-regular fa-bookmark me-1"></i>
+          <span><%= savedOnlySafe ? "Saved only" : "Saved" %></span>
+        </a>
+      <% } %>
+
+      <!-- Price button -->
+      <button id="priceBtn" type="button" class="btn btn-sm <%= hasPrice ? 'btn-brand' : 'btn-outline-brand' %>"
+              data-bs-toggle="offcanvas" data-bs-target="#priceFilter" style="white-space:nowrap">
+        <i class="fa-solid fa-tag me-1"></i><span id="priceBtnLabel"><%= priceLabel %></span>
+      </button>
+
+      <!-- Taxes toggle (desktop only) -->
+      <div class="tax-pill tax-pill--compact d-none d-sm-flex">
+        <i class="fa-solid fa-percent text-muted"></i>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input js-tax-toggle" type="checkbox" role="switch" id="taxSwitchDesktop">
+          <label class="form-check-label" for="taxSwitchDesktop">Taxes</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Price offcanvas -->
+<div class="offcanvas offcanvas-end sc-offcanvas" tabindex="-1" id="priceFilter">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Price Filter</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <form action="/listings" method="GET" class="d-grid gap-3">
+      <input type="hidden" name="q" value="<%= q || '' %>">
+      <input type="hidden" name="category" value="<%= category || '' %>">
+      <input type="hidden" name="sort" value="<%= sortSafe || 'newest' %>">
+      <input type="hidden" name="page" value="1">
+      <% if (savedOnlySafe) { %><input type="hidden" name="saved" value="1"><% } %>
+
+      <div>
+        <label class="form-label" for="minPrice">Minimum</label>
+        <input id="minPrice" type="number" name="minPrice" class="form-control" min="0" value="<%= minP %>">
+      </div>
+
+      <div>
+        <label class="form-label" for="maxPrice">Maximum</label>
+        <input id="maxPrice" type="number" name="maxPrice" class="form-control" min="0" value="<%= maxP %>">
+      </div>
+
+      <!-- Taxes toggle (mobile only inside offcanvas) -->
+      <div class="tax-pill d-sm-none">
+        <i class="fa-solid fa-percent text-muted"></i>
+        <div class="form-check form-switch m-0">
+          <input class="form-check-input js-tax-toggle" type="checkbox" role="switch" id="taxSwitchMobile">
+          <label class="form-check-label" for="taxSwitchMobile">Taxes</label>
+        </div>
+      </div>
+
+      <button class="btn btn-brand" type="submit">Apply</button>
+      <a class="btn btn-outline-brand" href="<%= buildUrl({ minPrice: null, maxPrice: null, page: 1 }) %>">Clear price</a>
+    </form>
+  </div>
+</div>
+
+<!-- Results count -->
+<div class="container-xl mt-2 sc-filter-bar">
+  <div
+    id="resultsCountText"
+    class="sc-results-count"
+    data-total="<%= totalCountSafe %>"
+    data-start="<%= rangeStartSafe %>"
+    data-end="<%= rangeEndSafe %>"
+    data-page="<%= pageSafe %>"
+    data-pages="<%= totalPagesSafe %>"
+  >
+    Showing <b><span id="scRangeStart"><%= rangeStartSafe %></span>-<span id="scRangeEnd"><%= rangeEndSafe %></span></b>
+    of <b><span id="scTotalCount"><%= totalCountSafe %></span></b> stays
+  </div>
+</div>
+
+<% if (allListings.length === 0) { %>
+  <div class="container-xl py-4 text-muted">No listings match your filters.</div>
+<% } %>
+
+<!-- Grid -->
+<div id="listingGrid" class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 listings-grid">
+  <% for (let listing of allListings) { %>
+    <div class="col reveal position-relative">
+      <% if (currentUser) { %>
+        <% const isSavedCard = savedIdsSafe.includes(listing._id.toString()); %>
+        <button type="button" class="listing-save-btn js-save-btn <%= isSavedCard ? 'is-saved' : '' %>"
+                data-id="<%= listing._id %>" data-csrf="<%= csrfToken %>">
+          <i class="<%= isSavedCard ? 'fa-solid' : 'fa-regular' %> fa-bookmark"></i>
+        </button>
+      <% } %>
+
+      <a href="/listings/<%= listing._id %>" class="listing-link">
+        <div class="card listing-card h-100">
+          <img
+            src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://source.unsplash.com/random/800x600?home' %>"
+            class="card-img-top"
+            alt="listing image"
+            loading="lazy"
+          >
+          <div class="card-body listing-body">
+            <div class="listing-title clamp-1"><%= listing.title %></div>
+
+            <div class="listing-meta clamp-1">
+              <i class="fa-solid fa-location-dot me-1"></i>
+              <%= listing.location %>, <%= listing.country %>
+            </div>
+
+            <% if (listing.ratingCount && listing.ratingCount > 0) { %>
+              <div class="listing-meta mt-1">
+                <i class="fa-solid fa-star me-1" style="color:#f59e0b;"></i>
+                <%= Number(listing.ratingAvg || 0).toFixed(1) %>
+                <span class="listing-meta">(<%= listing.ratingCount %>)</span>
+              </div>
+            <% } %>
+
+            <div class="mt-2 listing-price">
+              &#8377; <%= listing.price != null ? Number(listing.price).toLocaleString("en-IN") : "N/A" %>
+              <span class="listing-meta">/ night</span>
+              <i class="tax-info listing-meta">&nbsp; +18% GST</i>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  <% } %>
+</div>
+
+<!-- ✅ Desktop pagination (page numbers) -->
+<% if (totalPagesSafe > 1) { %>
+  <%
+    const maxLinks = 7;
+    let startPage = Math.max(1, pageSafe - Math.floor(maxLinks / 2));
+    let endPage = Math.min(totalPagesSafe, startPage + maxLinks - 1);
+    startPage = Math.max(1, endPage - maxLinks + 1);
+  %>
+
+  <nav class="container-xl mt-4 mb-2 sc-pagination d-none d-sm-block">
+    <ul class="pagination pagination-sm mb-0 justify-content-center">
+      <li class="page-item <%= pageSafe === 1 ? 'disabled' : '' %>">
+        <a class="page-link" href="<%= buildUrl({ page: pageSafe - 1 }) %>">Prev</a>
+      </li>
+
+      <% if (startPage > 1) { %>
+        <li class="page-item"><a class="page-link" href="<%= buildUrl({ page: 1 }) %>">1</a></li>
+        <% if (startPage > 2) { %><li class="page-item disabled"><span class="page-link">…</span></li><% } %>
+      <% } %>
+
+      <% for (let p = startPage; p <= endPage; p++) { %>
+        <li class="page-item <%= p === pageSafe ? 'active' : '' %>">
+          <a class="page-link" href="<%= buildUrl({ page: p }) %>"><%= p %></a>
+        </li>
+      <% } %>
+
+      <% if (endPage < totalPagesSafe) { %>
+        <% if (endPage < totalPagesSafe - 1) { %><li class="page-item disabled"><span class="page-link">…</span></li><% } %>
+        <li class="page-item"><a class="page-link" href="<%= buildUrl({ page: totalPagesSafe }) %>"><%= totalPagesSafe %></a></li>
+      <% } %>
+
+      <li class="page-item <%= pageSafe === totalPagesSafe ? 'disabled' : '' %>">
+        <a class="page-link" href="<%= buildUrl({ page: pageSafe + 1 }) %>">Next</a>
+      </li>
+    </ul>
+
+    <div class="text-center text-muted small mt-2">
+      Page <b><%= pageSafe %></b> of <b><%= totalPagesSafe %></b>
+    </div>
+  </nav>
+<% } %>
+
+<!-- ✅ Mobile “Load more” (smooth) -->
+<div class="container-xl mt-4 mb-4 d-block d-sm-none">
+  <% if (hasNextPage) { %>
+    <button
+      id="loadMoreBtn"
+      class="btn btn-brand w-100 sc-loadmore-btn"
+      type="button"
+      data-next-url="<%= nextUrl %>"
+    >
+      Load more (Page <%= pageSafe + 1 %> of <%= totalPagesSafe %>)
+    </button>
+
+    <div class="text-center text-muted small mt-2" id="mobilePageHint">
+      Page <b><%= pageSafe %></b> of <b><%= totalPagesSafe %></b>
+    </div>
+  <% } else { %>
+    <div class="text-center text-muted small">
+      Page <b><%= pageSafe %></b> of <b><%= totalPagesSafe %></b>
+    </div>
+  <% } %>
+</div>

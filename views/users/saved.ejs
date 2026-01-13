@@ -1,0 +1,88 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="show-page py-3">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0">Saved</h2>
+
+    <% if (savedListings && savedListings.length > 0) { %>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#clearSavedModal"
+      >
+        Clear all
+      </button>
+    <% } %>
+  </div>
+
+  <% if (!savedListings || savedListings.length === 0) { %>
+    <div class="text-muted">No saved listings yet.</div>
+  <% } else { %>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 listings-grid">
+      <% for (let listing of savedListings) { %>
+        <div class="col position-relative">
+
+          <!-- ✅ Unsave button (AJAX) -->
+          <button
+            type="button"
+            class="listing-save-btn js-save-btn is-saved"
+            data-id="<%= listing._id %>"
+            data-csrf="<%= csrfToken %>"
+            data-remove-on-unsave="1"
+            aria-label="Remove from Saved"
+          >
+            <i class="fa-solid fa-bookmark"></i>
+          </button>
+
+          <a href="/listings/<%= listing._id %>" class="listing-link">
+            <div class="card listing-card h-100">
+              <img
+                src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://source.unsplash.com/random/800x600?home' %>"
+                class="card-img-top"
+                alt="listing image"
+              >
+              <div class="card-body listing-body">
+                <div class="listing-title clamp-1"><%= listing.title %></div>
+                <div class="listing-meta clamp-1">
+                  <i class="fa-solid fa-location-dot me-1"></i>
+                  <%= listing.location %>, <%= listing.country %>
+                </div>
+                <div class="mt-2 listing-price">
+                  &#8377; <%= listing.price != null ? listing.price.toLocaleString("en-IN") : "N/A" %>
+                  <span class="listing-meta">/ night</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+        </div>
+      <% } %>
+    </div>
+
+    <!-- ✅ Confirmation Modal (Clear All) -->
+    <div class="modal fade" id="clearSavedModal" tabindex="-1" aria-labelledby="clearSavedModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="clearSavedModalLabel">Clear saved listings?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            This will remove <b>all</b> listings from your Saved list. This action cannot be undone.
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+
+            <form method="POST" action="/saved/clear" class="d-inline">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="btn btn-danger">Yes, clear all</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</div>

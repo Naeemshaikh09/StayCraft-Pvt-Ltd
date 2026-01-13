@@ -1,0 +1,95 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="legal-page py-4">
+  <div class="legal-hero">
+    <h1 class="legal-title">Help Center</h1>
+    <p class="legal-subtitle">
+      Quick answers about accounts, listings, reviews, saving stays, and security.
+    </p>
+    <p class="legal-meta">Last updated: <%= new Date().toLocaleDateString() %></p>
+  </div>
+
+  <div class="row g-4 mt-2">
+    <div class="col-12 col-lg-4">
+      <div class="card legal-card">
+        <div class="card-body">
+          <h5 class="mb-3">Popular topics</h5>
+          <ol class="legal-toc">
+            <li><a href="#accounts">Account & login</a></li>
+            <li><a href="#verification">Email verification</a></li>
+            <li><a href="#host">Hosting a listing</a></li>
+            <li><a href="#reviews">Reviews</a></li>
+            <li><a href="#saved">Saved listings</a></li>
+            <li><a href="#security">Security</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+      <div class="card legal-card mb-4" id="accounts">
+        <div class="card-body">
+          <h3 class="legal-section-title">1) Account & login</h3>
+          <ul class="mb-0">
+            <li>Use your username + password to log in.</li>
+            <li>If you forgot your password, use the <a href="/forgot">Forgot password</a> page.</li>
+            <li>We may rate limit repeated login attempts for security.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="verification">
+        <div class="card-body">
+          <h3 class="legal-section-title">2) Email verification</h3>
+          <p class="mb-0">
+            Some actions (like creating listings or posting reviews) may require a verified email.
+            If needed, request a new link from <a href="/verify-email/resend">Resend verification</a>.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="host">
+        <div class="card-body">
+          <h3 class="legal-section-title">3) Hosting a listing</h3>
+          <ul class="mb-0">
+            <li>Go to <a href="/listings/new">List your place</a>.</li>
+            <li>Upload a clear image and provide accurate location details.</li>
+            <li>If maps are enabled, you can pin an exact location.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="reviews">
+        <div class="card-body">
+          <h3 class="legal-section-title">4) Reviews</h3>
+          <ul class="mb-0">
+            <li>You can post a rating and a comment on a listing.</li>
+            <li>You can delete your own review.</li>
+            <li>Ratings may appear on listing cards as an average score.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="saved">
+        <div class="card-body">
+          <h3 class="legal-section-title">5) Saved listings</h3>
+          <ul class="mb-0">
+            <li>Click the bookmark icon to save/unsave a listing.</li>
+            <li>Open your Saved page from the bottom nav on mobile or from the account area.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card" id="security">
+        <div class="card-body">
+          <h3 class="legal-section-title">6) Security</h3>
+          <ul class="mb-0">
+            <li>Sessions are protected using HTTP-only cookies.</li>
+            <li>CSRF protection is enabled for secure actions.</li>
+            <li>Input validation + sanitization are used to prevent abuse.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

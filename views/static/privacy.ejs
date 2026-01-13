@@ -1,0 +1,177 @@
+<% layout("/layouts/boilerplate") %>
+
+<%
+  const lastUpdated = "2026-01-13";
+%>
+
+<div class="legal-page py-4">
+  <div class="legal-hero">
+    <h1 class="legal-title">Privacy Policy</h1>
+    <p class="legal-subtitle">
+      This Privacy Policy explains how StayCraft collects, uses, shares, and protects information when you use our website and services.
+    </p>
+    <p class="legal-meta">Last updated: <%= lastUpdated %></p>
+  </div>
+
+  <div class="row g-4 mt-2">
+    <div class="col-12 col-lg-4">
+      <div class="card legal-card">
+        <div class="card-body">
+          <h5 class="mb-3">Contents</h5>
+          <ol class="legal-toc">
+            <li><a href="#who">Who we are</a></li>
+            <li><a href="#data">Information we collect</a></li>
+            <li><a href="#use">How we use information</a></li>
+            <li><a href="#legal">Legal bases</a></li>
+            <li><a href="#sharing">Sharing</a></li>
+            <li><a href="#security">Security</a></li>
+            <li><a href="#retention">Retention</a></li>
+            <li><a href="#rights">Your rights</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-8">
+
+      <div class="card legal-card mb-4" id="who">
+        <div class="card-body">
+          <h3 class="legal-section-title">1) Who we are</h3>
+          <p class="mb-0">
+            StayCraft is a web platform for browsing, saving, and hosting travel listings. “We”, “us”, and “our” refer to StayCraft.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="data">
+        <div class="card-body">
+          <h3 class="legal-section-title">2) Information we collect</h3>
+          <ul class="mb-0">
+            <li><b>Account data</b>: username, email address, email verification status.</li>
+            <li><b>Authentication</b>: password is stored securely as a hash (we never store plaintext passwords).</li>
+            <li><b>Content you submit</b>: listings (title, description, location, country, price, category), uploaded images, reviews and ratings.</li>
+            <li><b>Saved items</b>: listings you choose to save.</li>
+            <li><b>Security/technical</b>: IP address and request metadata for abuse prevention (rate limiting) and security monitoring.</li>
+            <li><b>Session data</b>: cookie-based session identifiers so you can stay logged in.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="use">
+        <div class="card-body">
+          <h3 class="legal-section-title">3) How we use information</h3>
+          <ul class="mb-0">
+            <li>Operate the service (login, sessions, listing creation/editing, reviews).</li>
+            <li>Provide security protections (CSRF, rate limiting, validation, abuse prevention).</li>
+            <li>Send transactional emails (verification emails, password reset).</li>
+            <li>Display listing maps (geocoding may be used to convert a text location into coordinates).</li>
+            <li>Improve reliability and debug issues.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="legal">
+        <div class="card-body">
+          <h3 class="legal-section-title">4) Legal bases</h3>
+          <p class="mb-2">Depending on your region, we process data under:</p>
+          <ul class="mb-0">
+            <li><b>Contract</b> (to provide the service you request).</li>
+            <li><b>Legitimate interests</b> (to secure and improve the platform).</li>
+            <li><b>Consent</b> (where required, such as optional communications).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="sharing">
+        <div class="card-body">
+          <h3 class="legal-section-title">5) Sharing</h3>
+          <p>We do not sell your personal data. We may share data with service providers required to run the platform:</p>
+
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Provider</th>
+                  <th>Purpose</th>
+                  <th>Data involved</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cloudinary</td>
+                  <td>Store and deliver listing images</td>
+                  <td>Uploaded images + metadata</td>
+                </tr>
+                <tr>
+                  <td>Stadia Maps / Map services</td>
+                  <td>Map tiles and geocoding</td>
+                  <td>Location text + map requests</td>
+                </tr>
+                <tr>
+                  <td>Email provider (SMTP)</td>
+                  <td>Verification & reset emails</td>
+                  <td>Email address + message content</td>
+                </tr>
+                <tr>
+                  <td>MongoDB hosting</td>
+                  <td>Store application data</td>
+                  <td>Accounts, listings, reviews</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="mb-0 text-muted">
+            Providers may process data under their own policies.
+          </p>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="security">
+        <div class="card-body">
+          <h3 class="legal-section-title">6) Security</h3>
+          <ul class="mb-0">
+            <li>Passwords are hashed and never stored in plaintext.</li>
+            <li>Sessions use HTTP-only cookies to protect against client-side access.</li>
+            <li>CSRF protection is used for state-changing requests.</li>
+            <li>Input validation and sanitization help prevent common injection attacks.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="retention">
+        <div class="card-body">
+          <h3 class="legal-section-title">7) Retention</h3>
+          <ul class="mb-0">
+            <li>Account data is retained while your account is active.</li>
+            <li>Password reset and verification tokens expire automatically.</li>
+            <li>Security-related metadata may be retained temporarily for abuse prevention.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card mb-4" id="rights">
+        <div class="card-body">
+          <h3 class="legal-section-title">8) Your rights</h3>
+          <ul class="mb-0">
+            <li>Access and update your account information.</li>
+            <li>Request deletion of your account (subject to legal requirements).</li>
+            <li>Request a copy of your data where applicable.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card legal-card" id="contact">
+        <div class="card-body">
+          <h3 class="legal-section-title">9) Contact</h3>
+          <p class="mb-0">
+            Email: <b>support@staycraft.example</b><br/>
+            Address: <b>(replace with your address)</b>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

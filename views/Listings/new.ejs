@@ -1,0 +1,104 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-3">
+  <div class="col-12 col-md-8 offset-md-2">
+    <h2>Create new listing</h2>
+
+    <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input id="title" type="text" name="listing[title]" placeholder="Enter title" class="form-control" required>
+        <div class="valid-feedback">Title looks good!</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="listing[description]" placeholder="Enter description" class="form-control" required></textarea>
+        <div class="invalid-feedback">Please enter a valid description</div>
+      </div>
+
+      <!-- Category -->
+      <div class="mb-3">
+        <label for="category" class="form-label">Category</label>
+        <select id="category" name="listing[category]" class="form-select">
+          <option value="Trending" selected>Trending</option>
+          <option value="Rooms">Rooms</option>
+          <option value="Iconic cities">Iconic cities</option>
+          <option value="Amazing views">Amazing views</option>
+          <option value="Beachfront">Beachfront</option>
+          <option value="Amazing pools">Amazing pools</option>
+          <option value="Cabins">Cabins</option>
+          <option value="Camping">Camping</option>
+          <option value="Lakefront">Lakefront</option>
+          <option value="Arctic">Arctic</option>
+          <option value="Islands">Islands</option>
+          <option value="Castles">Castles</option>
+          <option value="Farms">Farms</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Upload image</label>
+        <input id="image" type="file" name="listing[image]" class="form-control" required>
+        <div class="invalid-feedback">Please upload an image</div>
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-12 col-md-4">
+          <label for="price" class="form-label">Price</label>
+          <input id="price" type="text" name="listing[price]" placeholder="1200" class="form-control" required>
+          <div class="invalid-feedback">Please enter a valid price</div>
+        </div>
+
+        <div class="mb-3 col-12 col-md-8">
+          <label for="country" class="form-label">Country</label>
+          <input id="country" type="text" name="listing[country]" placeholder="India" class="form-control" required>
+          <div class="invalid-feedback">Country is required</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input id="location" type="text" name="listing[location]" placeholder="Pune, Mumbai" class="form-control" required>
+        <div class="invalid-feedback">Location is required</div>
+      </div>
+
+      <!-- ✅ Map Picker (INSERTED BEFORE BUTTON) -->
+      <div class="show-panel mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h6 class="mb-0">Pin exact location</h6>
+
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-outline-brand" id="locateBtn">
+        Locate on map
+      </button>
+
+      <button type="button" class="btn btn-sm btn-brand" id="usePinBtn">
+        Use pin address
+      </button>
+    </div>
+  </div>
+
+  <div id="pickMap"></div>
+<small class="text-muted"></small>
+<div id="geoResults" class="list-group mt-2" style="display:none;"></div>
+<div id="pinStatus" class="small text-success mt-2" style="display:none;"></div>
+
+<input type="hidden" id="pickLng" name="listing[geometry][coordinates][0]" value="">
+<input type="hidden" id="pickLat" name="listing[geometry][coordinates][1]" value="">
+      <script>
+        window.mapPickerConfig = {
+          token: <%- JSON.stringify(process.env.MAP_TILE_TOKEN || process.env.MAP_TOKEN || "") %>,
+          lng: null,
+          lat: null
+        };
+      </script>
+      <script defer src="/js/mapPicker.js"></script>
+
+      <!-- ✅ Your Add button is HERE -->
+      <button class="btn btn-dark add-btn mt-3 mb-5" type="submit">Add</button>
+    </form>
+  </div>
+</div>

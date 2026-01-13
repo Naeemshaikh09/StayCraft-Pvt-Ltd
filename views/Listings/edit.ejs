@@ -1,0 +1,137 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row mt-3">
+  <div class="col-12 col-md-8 offset-md-2">
+    <h2>Edit Listing</h2>
+
+    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" enctype="multipart/form-data">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input
+          type="text"
+          name="listing[title]"
+          id="title"
+          placeholder="Enter title"
+          value="<%= listing.title %>"
+          class="form-control"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+          name="listing[description]"
+          id="description"
+          class="form-control textarea-compact"
+          maxlength="2000"
+        ><%= listing.description %></textarea>
+      </div>
+
+      <!-- Category -->
+      <div class="mb-3">
+        <label for="category" class="form-label">Category</label>
+        <select id="category" name="listing[category]" class="form-select">
+          <option value="Trending" <%= listing.category === "Trending" ? "selected" : "" %>>Trending</option>
+          <option value="Rooms" <%= listing.category === "Rooms" ? "selected" : "" %>>Rooms</option>
+          <option value="Iconic cities" <%= listing.category === "Iconic cities" ? "selected" : "" %>>Iconic cities</option>
+          <option value="Amazing views" <%= listing.category === "Amazing views" ? "selected" : "" %>>Amazing views</option>
+          <option value="Beachfront" <%= listing.category === "Beachfront" ? "selected" : "" %>>Beachfront</option>
+          <option value="Amazing pools" <%= listing.category === "Amazing pools" ? "selected" : "" %>>Amazing pools</option>
+          <option value="Cabins" <%= listing.category === "Cabins" ? "selected" : "" %>>Cabins</option>
+          <option value="Camping" <%= listing.category === "Camping" ? "selected" : "" %>>Camping</option>
+          <option value="Lakefront" <%= listing.category === "Lakefront" ? "selected" : "" %>>Lakefront</option>
+          <option value="Arctic" <%= listing.category === "Arctic" ? "selected" : "" %>>Arctic</option>
+          <option value="Islands" <%= listing.category === "Islands" ? "selected" : "" %>>Islands</option>
+          <option value="Castles" <%= listing.category === "Castles" ? "selected" : "" %>>Castles</option>
+          <option value="Farms" <%= listing.category === "Farms" ? "selected" : "" %>>Farms</option>
+        </select>
+      </div>
+
+      <% if (originalImageUrl) { %>
+        <div class="mb-3">
+          <img src="<%= originalImageUrl %>" alt="Listing image" class="img-fluid rounded">
+        </div>
+      <% } %>
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Upload new image</label>
+        <input type="file" name="listing[image]" id="image" class="form-control">
+      </div>
+
+      <div class="row">
+        <div class="mb-3 col-12 col-md-4">
+          <label for="price" class="form-label">Price</label>
+          <input
+            type="text"
+            name="listing[price]"
+            id="price"
+            placeholder="Enter price"
+            value="<%= listing.price %>"
+            class="form-control"
+          >
+        </div>
+
+        <div class="mb-3 col-12 col-md-8">
+          <label for="country" class="form-label">Country</label>
+          <input
+            type="text"
+            name="listing[country]"
+            id="country"
+            placeholder="Enter country"
+            value="<%= listing.country %>"
+            class="form-control"
+          >
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input
+          type="text"
+          name="listing[location]"
+          id="location"
+          placeholder="Enter location"
+          value="<%= listing.location %>"
+          class="form-control"
+        >
+      </div>
+
+      <!-- ✅ Map Picker (INSERTED BEFORE BUTTON) -->
+      <div class="show-panel mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h6 class="mb-0">Pin exact location</h6>
+
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-outline-brand" id="locateBtn">
+        Locate on map
+      </button>
+
+      <button type="button" class="btn btn-sm btn-brand" id="usePinBtn">
+        Use pin address
+      </button>
+    </div>
+  </div>
+<div id="pickMap"></div>
+<small class="text-muted"></small>
+<div id="geoResults" class="list-group mt-2" style="display:none;"></div>
+<div id="pinStatus" class="small text-success mt-2" style="display:none;"></div>
+
+<input type="hidden" id="pickLng" name="listing[geometry][coordinates][0]" value="">
+<input type="hidden" id="pickLat" name="listing[geometry][coordinates][1]" value="">
+
+      <script>
+        window.mapPickerConfig = {
+          token: <%- JSON.stringify(process.env.MAP_TILE_TOKEN || process.env.MAP_TOKEN || "") %>,
+          lng: <%- JSON.stringify((listing.geometry && listing.geometry.coordinates) ? listing.geometry.coordinates[0] : null) %>,
+          lat: <%- JSON.stringify((listing.geometry && listing.geometry.coordinates) ? listing.geometry.coordinates[1] : null) %>
+        };
+      </script>
+      <script defer src="/js/mapPicker.js"></script>
+
+      <!-- ✅ Your Edit button is HERE -->
+      <button type="submit" class="btn btn-dark edit-btn mt-3 mb-5">Edit</button>
+    </form>
+  </div>
+</div>
