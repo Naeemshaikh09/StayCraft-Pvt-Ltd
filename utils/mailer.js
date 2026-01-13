@@ -1,39 +1,22 @@
-const nodemailer = require("nodemailer");
+// utils/mailer.js
+const { Resend } = require("resend");
 
-const user = process.env.GMAIL_USER;
-const pass = process.env.GMAIL_APP_PASSWORD;
+async function sendMail({ to, subject, html, text }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.MAIL_FROM;
 
-if (!user || !pass) {
-  throw new Error("Missing GMAIL_USER or GMAIL_APP_PASSWORD");
-}
+  if (!apiKey) throw new Error("Missing RESEND_API_KEY");
+  if (!from) throw new Error("Missing MAIL_FROM");
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // 587 = STARTTLS
-  auth: { user, pass },
-  connectionTimeout: 20000,
-  greetingTimeout: 20000,
-  socketTimeout: 30000,
-});
-async function verifyMailerOnce() {
-  // Don't keep verifying again and again in production logs
-  if (process.env.NODE_ENV === "production") return;
+  const resend = new Resend(apiKey);
 
-  try {
-    await transporter.verify();
-    console.log("MAIL OK: SMTP connected");
-  } catch (err) {
-    console.error("VERIFY MAIL ERROR:", err.code || err.message);
-  }
-}
-
-async function sendMail(options) {
-  // options: { to, subject, text, html }
-  return transporter.sendMail({
-    from: user,
-    ...options,
+  return resend.emails.send({
+    from,
+    to,
+    subject,
+    html,
+    text,
   });
 }
 
-module.exports = { transporter, verifyMailerOnce, sendMail };
+module.exports = { sendMail };
