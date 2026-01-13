@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const wrapAsync = require("../utils/wrapasync.js");
+const wrapAsync = require("../utils/wrapAsync.js");
 const { verifyCsrf } = require("../utils/csrf");
 
 const { isLoggedIn, isOwner, isVerified, validateListing, validateObjectId } = require("../middelware.js");
