@@ -10,12 +10,11 @@ if (!user || !pass) {
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // 587 = STARTTLS (NOT SSL)
+  secure: false, // 587 = STARTTLS
   auth: { user, pass },
-
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 30000,
 });
 async function verifyMailerOnce() {
   // Don't keep verifying again and again in production logs
