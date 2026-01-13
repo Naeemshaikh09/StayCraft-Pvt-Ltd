@@ -69,10 +69,10 @@ async function sendVerificationEmail(user) {
   user.verifyEmailExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
   await user.save();
 
-  const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.BASE_URL;
   const verifyLink = `${baseUrl}/verify-email/${token}`;
 
-  await sendMail({
+  const result = await sendMail({
     to: user.email,
     subject: "Verify your StayCraft email",
     html: `
@@ -82,6 +82,7 @@ async function sendVerificationEmail(user) {
       <p>This link expires in 24 hours.</p>
     `,
   });
+  console.log("MAILGUN RESULT:", result);
 }
 module.exports.renderSignUpForm = (req, res) => {
   return res.render("users/signup.ejs");
