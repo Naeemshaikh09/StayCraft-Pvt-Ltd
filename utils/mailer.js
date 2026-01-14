@@ -22,7 +22,7 @@ function createTransporter() {
       pass: required("SMTP_PASS"),
     },
     requireTLS: !secure,
-    tls: { minVersion: "TLSv1.2" },
+    tls: { minVersion: "TLSv1.2", servername: host },
 
     // Avoid hanging on production
     connectionTimeout: 20000,
