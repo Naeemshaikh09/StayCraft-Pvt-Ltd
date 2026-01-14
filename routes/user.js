@@ -2,8 +2,15 @@ const express = require("express");
 const router = express.Router();
 const rateLimit = require("express-rate-limit");
 
-const { verifyCsrf } = require("../utils/csrf");
-const { savedRedirectUrl, validateSignup, validateLogin,isLoggedIn } = require("../middelware.js");
+// IMPORTANT: filename must match EXACTLY on Render/Linux.
+// If the real file is middleware.js, rename or fix this import.
+const {
+  savedRedirectUrl,
+  validateSignup,
+  validateLogin,
+  isLoggedIn,
+} = require("../middelware.js");
+
 const userControllers = require("../controllers/users.js");
 
 const signupLimiter = rateLimit({
@@ -30,7 +37,7 @@ const loginLimiter = rateLimit({
 
 const forgotLimiter = rateLimit({
   windowMs: 30 * 60 * 1000,
-  limit: 50, // ✅ increase for dev/testing
+  limit: 50,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
@@ -42,36 +49,33 @@ const forgotLimiter = rateLimit({
 router
   .route("/signup")
   .get(userControllers.renderSignUpForm)
-  .post(signupLimiter, verifyCsrf, validateSignup, userControllers.signup);
+  .post(signupLimiter, validateSignup, userControllers.signup);
 
 router
   .route("/login")
   .get(userControllers.renderLoginForm)
-  .post(loginLimiter, verifyCsrf, validateLogin, savedRedirectUrl, userControllers.login);
+  .post(loginLimiter, validateLogin, savedRedirectUrl, userControllers.login);
 
 router.get("/logout", userControllers.logout);
 
 router
   .route("/forgot")
   .get(userControllers.renderForgotForm)
-  .post(forgotLimiter, verifyCsrf, userControllers.forgotPassword);
+  .post(forgotLimiter, userControllers.forgotPassword);
 
 router
   .route("/reset/:token")
   .get(userControllers.renderResetForm)
-  .post(verifyCsrf, userControllers.resetPassword);
+  .post(userControllers.resetPassword);
 
-// ✅ resend verify email page + submit (must be FIRST)
 router
   .route("/verify-email/resend")
   .get(userControllers.renderResendVerify)
-  .post(verifyCsrf, userControllers.resendVerify);
+  .post(userControllers.resendVerify);
 
-// ✅ verify email link (must be AFTER resend)
 router.get("/verify-email/:token", userControllers.verifyEmail);
 
 router.get("/saved", isLoggedIn, userControllers.renderSaved);
-router.post("/saved/clear", isLoggedIn, verifyCsrf, userControllers.clearSaved);
-
+router.post("/saved/clear", isLoggedIn, userControllers.clearSaved);
 
 module.exports = router;

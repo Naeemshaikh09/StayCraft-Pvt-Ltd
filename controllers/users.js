@@ -9,6 +9,11 @@ const LOGIN_WINDOW_MS = 15 * 60 * 1000; // 15 min window
 const LOGIN_MAX_ATTEMPTS = 5;
 const LOGIN_LOCK_MS = 15 * 60 * 1000; // lock for 15 min
 
+function getBaseUrl() {
+  const raw = process.env.BASE_URL || "http://localhost:3000";
+  return raw.replace(/\/+$/, ""); // remove trailing slash
+}
+
 function usernameLowerFromReq(req) {
   return (req.body.username || "").toString().trim().toLowerCase();
 }
@@ -66,11 +71,14 @@ async function sendVerificationEmail(user) {
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
   user.verifyEmailTokenHash = tokenHash;
-  user.verifyEmailExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  user.verifyEmailExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   await user.save();
 
-  const baseUrl = process.env.BASE_URL;
-  const verifyLink = `${baseUrl}/verify-email/${token}`;
+  if (process.env.NODE_ENV === "production" && !process.env.BASE_URL) {
+    throw new Error("BASE_URL is missing in production (Render Environment).");
+  }
+
+  const verifyLink = `${getBaseUrl()}/verify-email/${token}`;
 
   const result = await sendMail({
     to: user.email,
@@ -82,7 +90,8 @@ async function sendVerificationEmail(user) {
       <p>This link expires in 24 hours.</p>
     `,
   });
-  console.log("MAILGUN RESULT:", result);
+
+  console.log("MAIL RESULT:", result);
 }
 module.exports.renderSignUpForm = (req, res) => {
   return res.render("users/signup.ejs");
@@ -117,7 +126,7 @@ module.exports.signup = async (req, res, next) => {
           await sendVerificationEmail(registeredUser);
           req.flash("success", "Account created! Please verify your email (check inbox).");
         } catch (e) {
-           console.error("VERIFY MAIL ERROR:", e.message);
+            console.error("VERIFY MAIL ERROR FULL:", e);
             req.flash("error", "Account created, but verification email could not be sent. Try again later.");
         }
 
@@ -219,8 +228,8 @@ module.exports.forgotPassword = async (req, res, next) => {
     user.resetPasswordExpires = new Date(Date.now() + 30 * 60 * 1000); // 30 min
     await user.save();
 
-    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    const resetLink = `${baseUrl}/reset/${token}`;
+    // ✅ use getBaseUrl here
+    const resetLink = `${getBaseUrl()}/reset/${token}`;
 
     try {
       await sendMail({
@@ -234,7 +243,7 @@ module.exports.forgotPassword = async (req, res, next) => {
         `,
       });
     } catch (mailErr) {
-       console.error("MAIL ERROR FULL:", mailErr);
+      console.error("MAIL ERROR FULL:", mailErr);
 
       // cleanup token since email was not sent
       user.resetPasswordTokenHash = null;

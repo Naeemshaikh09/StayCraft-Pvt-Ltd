@@ -1,16 +1,12 @@
 // app.js
-
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
-console.log("NODE_ENV =", process.env.NODE_ENV);
-console.log("Has RESEND_API_KEY?", Boolean(process.env.RESEND_API_KEY));
-console.log("RESEND keys:", Object.keys(process.env).filter(k => k.includes("RESEND")));
+
 const express = require("express");
 const app = express();
 
-// IMPORTANT (Render/any proxy):
-// Fixes express-rate-limit X-Forwarded-For warning and helps secure cookies work behind proxy.
+// IMPORTANT (Render/proxy). Must be before session + rateLimit.
 app.set("trust proxy", 1);
 
 const mongoose = require("mongoose");
@@ -41,6 +37,9 @@ const listings = require("./routes/listing.js");
 const reviewsRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
+// ✅ ONE secret for cookieParser + session + store crypto
+const sessionSecret = process.env.SESSION_SECRET || "dev_secret";
+
 // view + parsing
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
@@ -49,7 +48,9 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cookieParser(process.env.SESSION_SECRET));
+
+// ✅ MUST match session secret
+app.use(cookieParser(sessionSecret));
 
 // -------------------- security middleware --------------------
 app.use(
@@ -60,7 +61,6 @@ app.use(
 
 const cspDirectives = {
   defaultSrc: ["'self'"],
-
   scriptSrc: [
     "'self'",
     "'unsafe-inline'",
@@ -68,7 +68,6 @@ const cspDirectives = {
     "https://cdnjs.cloudflare.com",
     "https://unpkg.com",
   ],
-
   styleSrc: [
     "'self'",
     "'unsafe-inline'",
@@ -77,14 +76,12 @@ const cspDirectives = {
     "https://fonts.googleapis.com",
     "https://unpkg.com",
   ],
-
   fontSrc: [
     "'self'",
     "data:",
     "https://fonts.gstatic.com",
     "https://cdnjs.cloudflare.com",
   ],
-
   imgSrc: [
     "'self'",
     "data:",
@@ -94,8 +91,6 @@ const cspDirectives = {
     "https://source.unsplash.com",
     "https://images.unsplash.com",
   ],
-
-  // map libs / tiles
   connectSrc: [
     "'self'",
     "https://cdn.jsdelivr.net",
@@ -103,7 +98,6 @@ const cspDirectives = {
     "https://tiles.stadiamaps.com",
     "https://api.stadiamaps.com",
   ],
-
   workerSrc: ["'self'", "blob:"],
   objectSrc: ["'none'"],
   baseUri: ["'self'"],
@@ -138,37 +132,38 @@ mongoose
 // session store
 const store = MongoStore.create({
   mongoUrl: dbUrl,
-  crypto: { secret: process.env.SESSION_SECRET || "dev_secret" },
+  crypto: { secret: sessionSecret },
   touchAfter: 24 * 3600,
 });
 
-const sessionOptions = {
-  store,
-  name: "staycraft.sid",
-  secret: process.env.SESSION_SECRET || "dev_secret",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  },
-};
+app.use(
+  session({
+    store,
+    name: "staycraft.sid",
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
+  })
+);
 
-app.use(session(sessionOptions));
 app.use(flash());
 
 // expose csrfToken to all ejs
 app.use(csrfToken);
 
-// global CSRF verification for non-multipart write requests
+// Global CSRF verification (so routes don’t need verifyCsrf)
 app.use((req, res, next) => {
   const writeMethods = ["POST", "PUT", "PATCH", "DELETE"];
   if (!writeMethods.includes(req.method)) return next();
 
   const ct = req.headers["content-type"] || "";
-  if (ct.startsWith("multipart/form-data")) return next(); // handled inside routes
+  if (ct.startsWith("multipart/form-data")) return next();
 
   return verifyCsrf(req, res, next);
 });
@@ -201,10 +196,7 @@ const safeBack = (req) => req.get("Referrer") || "/listings";
 
 app.use((err, req, res, next) => {
   if (err?.code === "EBADCSRFTOKEN") {
-    req.flash(
-      "error",
-      err.message || "Form expired or invalid. Please try again."
-    );
+    req.flash("error", err.message || "Form expired or invalid. Please try again.");
     return res.redirect(safeBack(req));
   }
   next(err);
@@ -231,5 +223,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(process.env.PORT || 3000, () =>
-  console.log("✅ Server running on port 3000")
+  console.log("✅ Server running on port", process.env.PORT || 3000)
 );
