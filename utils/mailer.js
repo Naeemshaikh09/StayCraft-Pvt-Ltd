@@ -1,6 +1,7 @@
 // utils/mailer.js
 const nodemailer = require("nodemailer");
 
+console.log("MAILER LOADED: Nodemailer SMTP version 67f1415");
 function required(name) {
   const v = process.env[name];
   if (!v) throw new Error(`${name} is missing in environment variables`);
