@@ -1,11 +1,14 @@
 // app.js
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const { verifySmtp } = require("./utils/mailer");
 
+if (process.env.NODE_ENV === "production") {
+  verifySmtp().catch((err) => {
+    console.error("❌ SMTP VERIFY FAILED:", err);
+  });
+}
 // IMPORTANT (Render/proxy). Must be before session + rateLimit.
 app.set("trust proxy", 1);
 
