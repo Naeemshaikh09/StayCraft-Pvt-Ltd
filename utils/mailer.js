@@ -1,6 +1,7 @@
 // utils/mailer.js
 const nodemailer = require("nodemailer");
-
+console.log("SMTP_USER set?", !!process.env.SMTP_USER);
+console.log("SMTP_PASS length:", process.env.SMTP_PASS?.length);
 console.log("MAILER LOADED: Nodemailer SMTP version 67f1415");
 function required(name) {
   const v = process.env[name];
