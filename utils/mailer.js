@@ -1,49 +1,37 @@
-// utils/mailer.js (Mailgun HTTP API)
+// utils/mailer.js (Brevo SMTP with Nodemailer)
+const nodemailer = require("nodemailer");
+
 function required(name) {
   const v = process.env[name];
   if (!v) throw new Error(`Missing ${name}`);
   return v;
 }
 
-const MAILGUN_API_KEY = required("MAILGUN_API_KEY");
-const MAILGUN_DOMAIN = required("MAILGUN_DOMAIN");
-const MAIL_FROM = required("MAIL_FROM");
-const MAILGUN_REGION = (process.env.MAILGUN_REGION || "US").toUpperCase();
+const SMTP_HOST = process.env.SMTP_HOST || "smtp-relay.brevo.com";
+const SMTP_PORT = Number(process.env.SMTP_PORT || 587);
+const SMTP_USER = required("SMTP_USER"); // Brevo SMTP login
+const SMTP_PASS = required("SMTP_PASS"); // Brevo SMTP key
+const SMTP_FROM = required("SMTP_FROM"); // e.g. "StayCraft <naeemshaikh09sss@gmail.com>"
 
-const MAILGUN_BASE =
-  MAILGUN_REGION === "EU" ? "https://api.eu.mailgun.net" : "https://api.mailgun.net";
+const transporter = nodemailer.createTransport({
+  host: SMTP_HOST,
+  port: SMTP_PORT,
+  secure: SMTP_PORT === 465, // true only for port 465
+  auth: { user: SMTP_USER, pass: SMTP_PASS },
+  requireTLS: SMTP_PORT === 587,
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 30000,
+});
 
 async function sendMail({ to, subject, html, text }) {
-  const url = `${MAILGUN_BASE}/v3/${MAILGUN_DOMAIN}/messages`;
-
-  const body = new URLSearchParams();
-  body.set("from", MAIL_FROM);
-  body.set("to", to);
-  body.set("subject", subject);
-  if (text) body.set("text", text);
-  if (html) body.set("html", html);
-
-  const auth = Buffer.from(`api:${MAILGUN_API_KEY}`).toString("base64");
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body,
+  return transporter.sendMail({
+    from: SMTP_FROM,
+    to,
+    subject,
+    text,
+    html,
   });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    const msg = data?.message || `Mailgun error: HTTP ${res.status}`;
-    const err = new Error(msg);
-    err.mailgun = data;
-    throw err;
-  }
-
-  return data; // contains id + message
 }
 
 module.exports = { sendMail };
