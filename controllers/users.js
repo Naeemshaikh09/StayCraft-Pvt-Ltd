@@ -117,8 +117,8 @@ module.exports.signup = async (req, res, next) => {
           await sendVerificationEmail(registeredUser);
           req.flash("success", "Account created! Please verify your email (check inbox).");
         } catch (e) {
-          console.error("VERIFY MAIL ERROR:", e.message);
-          req.flash("error", "Account created, but verification email could not be sent. Try again later.");
+           console.error("VERIFY MAIL ERROR:", e.message);
+            req.flash("error", "Account created, but verification email could not be sent. Try again later.");
         }
 
         return res.redirect("/listings");
@@ -234,7 +234,7 @@ module.exports.forgotPassword = async (req, res, next) => {
         `,
       });
     } catch (mailErr) {
-      console.error("MAIL ERROR:", mailErr.message);
+       console.error("MAIL ERROR FULL:", mailErr);
 
       // cleanup token since email was not sent
       user.resetPasswordTokenHash = null;
@@ -357,7 +357,7 @@ module.exports.resendVerify = async (req, res) => {
     req.flash("success", msg);
     return res.redirect("/verify-email/resend");
   } catch (e) {
-    console.error("VERIFY MAIL ERROR:", e.message);
+    console.error("VERIFY MAIL ERROR FULL:", e);
     req.flash("error", "Could not send verification email. Try again later.");
     return res.redirect("/verify-email/resend");
   }
